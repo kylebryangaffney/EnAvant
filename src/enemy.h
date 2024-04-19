@@ -1,10 +1,10 @@
 #include "raylib.h"
 #include "baseCharacter.h"
 
-class Character : public BaseCharacter
+class Enemy : public BaseCharacter
 {
 public:
-    Character(int winWidth, int winHeight);
+    Enemy(Vector2 pos, Texture2D idleTexture, Texture2D runTexture);
     Vector2 getWorldPos()
     {
         return worldPos;
@@ -20,9 +20,9 @@ public:
     Rectangle getCollisionRec();
 
 private:
-    Texture2D texture{LoadTexture("characters\\knight_idle_spritesheet.png")};
-    Texture2D idle{LoadTexture("characters\\knight_idle_spritesheet.png")};
-    Texture2D run{LoadTexture("characters\\knight_run_spritesheet.png")};
+    Texture2D texture{};
+    Texture2D idle{};
+    Texture2D run{};
     Vector2 screenPos{};
     Vector2 worldPos{};
     Vector2 worldPosLastFrame{};
