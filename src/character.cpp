@@ -10,14 +10,9 @@ Character::Character(int winWidth, int winHeight)
         static_cast<float>(winHeight) / 2.0f - charScale * (0.5f * height)};
 }
 
-void Character::undoMovement()
-{
-    worldPos = worldPosLastFrame;
-}
-
 void Character::tick(float deltaTime)
 {
-    worldPosLastFrame = worldPos;
+    BaseCharacter::tick(deltaTime);
     // check key input
     Vector2 direction{};
     if (IsKeyDown(KEY_LEFT))
@@ -41,23 +36,4 @@ void Character::tick(float deltaTime)
     {
         texture = idle;
     }
-    // update animation frame for knight
-    runningTime += deltaTime;
-    if (runningTime >= updateTime)
-    {
-        frame++;
-        runningTime = 0.f;
-        if (frame > maxFrames)
-            frame = 0;
-    }
-    // draw knight
-    Rectangle source{width * static_cast<float>(frame), 0.0f, rightLeft * width, height};
-    Rectangle dest{screenPos.x, screenPos.y, charScale * width, charScale * height};
-    Vector2 origin{0.0f, 0.0f};
-    DrawTexturePro(texture, source, dest, origin, 0.0f, WHITE);
-}
-
-Rectangle Character::getCollisionRec()
-{
-    return Rectangle{screenPos.x, screenPos.y, width * charScale, height * charScale};
 }
