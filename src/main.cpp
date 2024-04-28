@@ -15,6 +15,7 @@ int main()
 
     Character knight{windowWidth, windowHeight};
     Enemy goblin{Vector2{150.f, 555.f}, LoadTexture("characters\\goblin_idle_spritesheet.png"), LoadTexture("characters\\goblin_run_spritesheet.png")};
+    goblin.setTarget(&knight);
 
     Prop propArray[2]{
         Prop{Vector2{666.f, 333.f}, LoadTexture("nature_tileset\\Rock.png")},
@@ -54,7 +55,6 @@ int main()
                 knight.undoMovement();
             }
         }
-
         goblin.tick(GetFrameTime());
 
         EndDrawing();

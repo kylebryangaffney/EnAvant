@@ -1,3 +1,5 @@
+#ifndef PROP_H
+#define PROP_H
 #include "raylib.h"
 
 class Prop
@@ -12,3 +14,5 @@ private:
     Texture2D texture{};
     float propScale{4.f};
 };
+
+#endif
