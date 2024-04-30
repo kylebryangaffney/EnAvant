@@ -14,18 +14,18 @@ Enemy::Enemy(Vector2 pos, Texture2D idleTexture, Texture2D runTexture)
 void Enemy::tick(float deltaTime)
 {
     // get toTarget vector -- direction of the knight in comparison to the enemy
-    Vector2 toTarget = Vector2Subtract(target->getScreenPos(), screenPos);
-    // normalize toTarget Vector
-    toTarget = Vector2Normalize(toTarget);
-    // multiply toTarget Vector by speed
-    toTarget = Vector2Scale(toTarget, speed);
+    velocity = Vector2Subtract(target->getScreenPos(), getScreenPos());
     // move enemy -- set worldPos
-    worldPos = Vector2Add(worldPos, toTarget);
-    screenPos = Vector2Subtract(worldPos, target->getWorldPos());
     BaseCharacter::tick(deltaTime);
 }
 
 void Enemy::setTarget(Character *character)
 {
     target = character;
+}
+
+Vector2 Enemy::getScreenPos()
+{
+    // Calculate the screen position relative to the target character
+    return Vector2Subtract(worldPos, target->getWorldPos());
 }

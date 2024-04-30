@@ -1,18 +1,21 @@
 #ifndef CHARACTER_H
 #define CHARACTER_H
-
 #include "raylib.h"
+#include "raymath.h"
 #include "baseCharacter.h"
 
 class Character : public BaseCharacter
 {
 public:
     Character(int winWidth, int winHeight);
-    Vector2 getScreenPos() { return screenPos; }
-
+    virtual Vector2 getScreenPos() override;
     virtual void tick(float deltaTime) override;
 
 private:
+    int windowWidth{};
+    int windowHeight{};
+    Texture2D weapon{LoadTexture("characters\\weapon_sword.png")};
+    Rectangle wepCollisionRec{};
 };
 
 #endif
