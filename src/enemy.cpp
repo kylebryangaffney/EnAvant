@@ -13,10 +13,17 @@ Enemy::Enemy(Vector2 pos, Texture2D idleTexture, Texture2D runTexture)
 
 void Enemy::tick(float deltaTime)
 {
+    if (!getIsAlive())
+        return;
     // get toTarget vector -- direction of the knight in comparison to the enemy
     velocity = Vector2Subtract(target->getScreenPos(), getScreenPos());
-    // move enemy -- set worldPos
+    if (Vector2Length(velocity) < closeRadius || Vector2Length(velocity) > attackRadius)
+        velocity = {};
     BaseCharacter::tick(deltaTime);
+    if (CheckCollisionRecs(target->getCollisionRec(), getCollisionRec()))
+    {
+        target->takeDamage(damagePerSec * deltaTime);
+    }
 }
 
 void Enemy::setTarget(Character *character)

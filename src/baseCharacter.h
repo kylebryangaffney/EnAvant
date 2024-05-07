@@ -19,6 +19,8 @@ public:
         return charScale;
     }
     virtual Vector2 getScreenPos() = 0;
+    bool getIsAlive() { return isAlive; }
+    void setIsAlive(bool alive) { isAlive = alive; }
 
 protected:
     Texture2D texture{LoadTexture("characters\\knight_idle_spritesheet.png")};
@@ -38,8 +40,10 @@ protected:
     float height{};
     float charScale{4.f};
     Vector2 velocity{};
+    Sound runningSound{};
 
 private:
+    bool isAlive{true};
 };
 
 #endif

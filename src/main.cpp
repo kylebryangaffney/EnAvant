@@ -3,23 +3,34 @@
 #include "character.h"
 #include "prop.h"
 #include "enemy.h"
+#include <string>
 
 int main()
 {
-    const int windowWidth{384};
-    const int windowHeight{384};
+    const int windowWidth{900};
+    const int windowHeight{900};
     InitWindow(windowWidth, windowHeight, "EnAvant");
 
     Texture2D map = LoadTexture("nature_tileset\\WorldMap.png");
     Vector2 mapPos{0.0f, 0.0f};
 
     Character knight{windowWidth, windowHeight};
-    // Enemy goblin{Vector2{150.f, 555.f}, LoadTexture("characters\\goblin_idle_spritesheet.png"), LoadTexture("characters\\goblin_run_spritesheet.png")};
-    // goblin.setTarget(&knight);
+    // Enemy goblin{Vector2{450.f, 555.f}, LoadTexture("characters\\goblin_idle_spritesheet.png"), LoadTexture("characters\\goblin_run_spritesheet.png")};
 
+    // Enemy slime{Vector2{555.f, 333.f}, LoadTexture("characters\\slime_idle_spritesheet.png"), LoadTexture("characters\\slime_run_spritesheet.png")};
+    InitAudioDevice();
+    Sound footStepSound = LoadSound("soundFX\\footstep.wav");
+    //  jump variable
     Prop propArray[2]{
         Prop{Vector2{666.f, 333.f}, LoadTexture("nature_tileset\\Rock.png")},
         Prop{Vector2{222.f, 444.f}, LoadTexture("nature_tileset\\Log.png")}};
+    Prop swordProp{Vector2{900.f, 900.f}, LoadTexture("characters\\weapon_sword.png")};
+
+    // Enemy *enemyArray[]{&goblin, &slime};
+    for (int i = 0; i < 2; i++)
+    {
+        // enemyArray[i]->setTarget(&knight);
+    }
 
     SetTargetFPS(60);
     while (!WindowShouldClose())
@@ -35,6 +46,22 @@ int main()
         for (int i = 0; i < 2; i++)
         {
             propArray[i].Render(knight.getWorldPos());
+        }
+        if (!knight.checkSword())
+        {
+            swordProp.Render(knight.getWorldPos());
+        }
+        if (!knight.getIsAlive()) // knight died
+        {
+            DrawText("Game Over", 200.f, 200.f, 35, RED);
+            EndDrawing();
+            continue;
+        }
+        else
+        {
+            std::string knightHealth = "HP: ";
+            knightHealth.append(std::to_string(knight.getHealth()), 0, 2);
+            DrawText(knightHealth.c_str(), 40.f, 40.f, 35, RED);
         }
         knight.tick(GetFrameTime());
 
@@ -55,8 +82,21 @@ int main()
                 knight.undoMovement();
             }
         }
-        // goblin.tick(GetFrameTime());
-
+        if (CheckCollisionRecs(knight.getCollisionRec(), swordProp.getCollisionRec(knight.getWorldPos())))
+        {
+            knight.takeSword();
+        }
+        for (int i = 0; i < 2; i++)
+        {
+            // enemyArray[i]->tick(GetFrameTime());
+            if (IsKeyPressed(KEY_SPACE))
+            {
+                // if (CheckCollisionRecs(knight.getWeaponCollisionRec(), enemyArray[i]->getCollisionRec()))
+                {
+                    // enemyArray[i]->setIsAlive(false);
+                }
+            }
+        }
         EndDrawing();
     }
     CloseWindow();

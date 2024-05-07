@@ -16,6 +16,9 @@ public:
 
 private:
     Character *target{};
+    float damagePerSec{10.f};
+    float closeRadius{25.f};
+    float attackRadius{300.f};
 };
 
 #endif

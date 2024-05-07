@@ -16,7 +16,8 @@ Vector2 Character::getScreenPos()
 
 void Character::tick(float deltaTime)
 {
-
+    if (!getIsAlive())
+        return;
     // check key input
     if (IsKeyDown(KEY_LEFT))
         velocity.x -= 1.0;
@@ -35,29 +36,51 @@ void Character::tick(float deltaTime)
     {
         origin = {0.f, static_cast<float>(weapon.height) * charScale};
         wepOffset = {40.f, 55.f};
-        wepCollisionRec = {
-            getScreenPos().x + wepOffset.x,
-            getScreenPos().y + wepOffset.y - weapon.height * charScale,
-            static_cast<float>(weapon.width) * charScale,
-            static_cast<float>(weapon.height) * charScale};
+        if (hasSword)
+        {
+            wepCollisionRec = {
+                getScreenPos().x + wepOffset.x,
+                getScreenPos().y + wepOffset.y - weapon.height * charScale,
+                static_cast<float>(weapon.width) * charScale,
+                static_cast<float>(weapon.height) * charScale};
+        }
+        rotation = IsKeyDown(KEY_SPACE) ? 35.f : 0.f;
     }
     else
     {
         origin = {static_cast<float>(weapon.width) * charScale, static_cast<float>(weapon.height) * charScale};
         wepOffset = {25.f, 55.f};
-        wepCollisionRec = {
-            getScreenPos().x + wepOffset.x - weapon.width * charScale,
-            getScreenPos().y + wepOffset.y - weapon.height * charScale,
-            static_cast<float>(weapon.width) * charScale,
-            static_cast<float>(weapon.height) * charScale};
-        rotation *= -1;
+        if (hasSword)
+        {
+            wepCollisionRec = {
+                getScreenPos().x + wepOffset.x - weapon.width * charScale,
+                getScreenPos().y + wepOffset.y - weapon.height * charScale,
+                static_cast<float>(weapon.width) * charScale,
+                static_cast<float>(weapon.height) * charScale};
+        }
+        rotation = IsKeyDown(KEY_SPACE) ? -35.f : -0.f;
     }
 
     // draw sword for nkight
     Rectangle source{0.f, 0.f, static_cast<float>(weapon.width) * rightLeft, static_cast<float>(weapon.height)};
     Rectangle dest{getScreenPos().x + wepOffset.x, getScreenPos().y + wepOffset.y, static_cast<float>(weapon.width) * charScale, static_cast<float>(weapon.height) * charScale};
-    DrawTexturePro(weapon, source, dest, origin, rotation, WHITE);
+    if (hasSword)
+        DrawTexturePro(weapon, source, dest, origin, rotation, WHITE);
 
     DrawRectangleLines(
         wepCollisionRec.x, wepCollisionRec.y, wepCollisionRec.width, wepCollisionRec.height, RED);
+}
+
+void Character::takeDamage(float damage)
+{
+    health -= damage;
+    if (health <= 0.f)
+    {
+        setIsAlive(false);
+    }
+}
+
+void Character::takeSword()
+{
+    hasSword = true;
 }
