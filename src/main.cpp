@@ -15,26 +15,37 @@ int main()
     Vector2 mapPos{0.0f, 0.0f};
 
     Character knight{windowWidth, windowHeight};
-    // Enemy goblin{Vector2{450.f, 555.f}, LoadTexture("characters\\goblin_idle_spritesheet.png"), LoadTexture("characters\\goblin_run_spritesheet.png")};
+    Enemy goblin{Vector2{450.f, 555.f}, LoadTexture("characters\\goblin_idle_spritesheet.png"), LoadTexture("characters\\goblin_run_spritesheet.png")};
 
-    // Enemy slime{Vector2{555.f, 333.f}, LoadTexture("characters\\slime_idle_spritesheet.png"), LoadTexture("characters\\slime_run_spritesheet.png")};
+    Enemy slime{Vector2{555.f, 333.f}, LoadTexture("characters\\slime_idle_spritesheet.png"), LoadTexture("characters\\slime_run_spritesheet.png")};
     InitAudioDevice();
-    Sound footStepSound = LoadSound("soundFX\\footstep.wav");
+    Music classicalMusic = LoadMusicStream("soundFX\\gregorquendel_schumann.wav");
+    Music hatefulMusic = LoadMusicStream("soundFX\\metal_tune.mp3");
+
+    // Set up initial background music
+    Music bgMusic = classicalMusic;
+    PlayMusicStream(bgMusic);
+
+    float timePlayed = 0.0f;
     //  jump variable
     Prop propArray[2]{
         Prop{Vector2{666.f, 333.f}, LoadTexture("nature_tileset\\Rock.png")},
         Prop{Vector2{222.f, 444.f}, LoadTexture("nature_tileset\\Log.png")}};
-    Prop swordProp{Vector2{900.f, 900.f}, LoadTexture("characters\\weapon_sword.png")};
+    Prop *swordProp = nullptr;
 
-    // Enemy *enemyArray[]{&goblin, &slime};
+    Enemy *enemyArray[]{&goblin, &slime};
     for (int i = 0; i < 2; i++)
     {
-        // enemyArray[i]->setTarget(&knight);
+        enemyArray[i]->setTarget(&knight);
     }
 
     SetTargetFPS(60);
     while (!WindowShouldClose())
     {
+        UpdateMusicStream(bgMusic);
+        timePlayed = GetMusicTimePlayed(bgMusic) / GetMusicTimeLength(bgMusic);
+        if (timePlayed > 1.0f)
+            timePlayed = 1.0f;
         BeginDrawing();
         ClearBackground(WHITE);
 
@@ -43,13 +54,18 @@ int main()
         // draw map
         DrawTextureEx(map, mapPos, 0.f, knight.getCharScale(), WHITE);
 
+        if (!knight.checkSword() && swordProp == nullptr)
+        {
+            swordProp = new Prop{Vector2{900.f, 900.f}, LoadTexture("characters\\weapon_sword.png")};
+        }
+
         for (int i = 0; i < 2; i++)
         {
             propArray[i].Render(knight.getWorldPos());
         }
-        if (!knight.checkSword())
+        if (swordProp != nullptr && swordProp->getIsAlive())
         {
-            swordProp.Render(knight.getWorldPos());
+            swordProp->Render(knight.getWorldPos());
         }
         if (!knight.getIsAlive()) // knight died
         {
@@ -82,22 +98,31 @@ int main()
                 knight.undoMovement();
             }
         }
-        if (CheckCollisionRecs(knight.getCollisionRec(), swordProp.getCollisionRec(knight.getWorldPos())))
+        if (swordProp != nullptr && swordProp->getIsAlive() &&
+            CheckCollisionRecs(knight.getCollisionRec(), swordProp->getCollisionRec(knight.getWorldPos())))
         {
             knight.takeSword();
+            swordProp->setIsAlive(false);
+            delete swordProp;
+            swordProp = nullptr;
+            StopMusicStream(bgMusic);
+            bgMusic = hatefulMusic;
+            PlayMusicStream(bgMusic);
         }
         for (int i = 0; i < 2; i++)
         {
-            // enemyArray[i]->tick(GetFrameTime());
+            enemyArray[i]->tick(GetFrameTime());
             if (IsKeyPressed(KEY_SPACE))
             {
-                // if (CheckCollisionRecs(knight.getWeaponCollisionRec(), enemyArray[i]->getCollisionRec()))
+                if (CheckCollisionRecs(knight.getWeaponCollisionRec(), enemyArray[i]->getCollisionRec()))
                 {
-                    // enemyArray[i]->setIsAlive(false);
+                    enemyArray[i]->setIsAlive(false);
                 }
             }
         }
         EndDrawing();
     }
+    UnloadMusicStream(bgMusic);
+    CloseAudioDevice();
     CloseWindow();
 }
